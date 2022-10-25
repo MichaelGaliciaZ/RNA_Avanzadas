@@ -1,15 +1,3 @@
-**Instituto Politécnico Nacional**
-
-**Centro de Investigación en Computación**
-
-**Redes Neuronales Avanzadas**
-
-Nombre completo: Miguel Aarón Galicia Zainos
-
-Fecha de entrega: 24 de October de 2022
-
-**Tarea 3: Clasificador de Personajes con CNN**
-
 # Descripción del problema
 
 Es necesario realizar una red neuronal convolucional en conjunto con un clasificador para identificar personajes de Springfield. Esto se realizará por medio del dataset [https://www.kaggle.com/jfgm2018/the-simpsons-dataset-compilation-49-characters](https://www.kaggle.com/jfgm2018/the-simpsons-dataset-compilation-49-characters)
@@ -30,11 +18,11 @@ Puntos por tomar en cuenta:
 
 El dataset fue creado originalmente por Alexandre Attia en 2017 mediante capturas de imagen en video, posteriormente se agregaron más imágenes por otros usuarios de la plataforma Kaggle.
 
-|
- | Nombre | Train Image | Test Image |
+<div align="center">
+ 
+Clase | Nombre | Train Image | Test Image |
 | --- | --- | --- | --- |
 | 0 | homer\_simpson | 4128 | 306 |
-| --- | --- | --- | --- |
 | 1 | bart\_simpson | 2562 | 261 |
 | 2 | lisa\_simpson | 2383 | 222 |
 | 3 | marge\_simpson | 1810 | 307 |
@@ -84,10 +72,11 @@ El dataset fue creado originalmente por Alexandre Attia en 2017 mediante captura
 | 47 | fat\_tony | 27 | 66 |
 | 48 | disco\_stu | 8 | 77 |
 | Total | 29895 | 4680 |
+</div>
 
 Como se aprecia en la Tabla anterior se cuenta con un total de 29895 imágenes para entrenamiento, sin embargo, no hay una cantidad homogénea de datos entre las clases, por ejemplo, para la clase _"homer\_simpson"_ se tienen 4128 imágenes para entrenamiento y en la clase _"disco\_stu"_ solo se cuentan con 8 imágenes. Los dataset desbalanceados provocan un sesgo en los resultados del modelo, por lo tanto, se deben tomar acciones para evitarlo. En general, estas acciones tendrán como objetivo aumentar los datos. Los datos de test se encuentran mal distribuidos, por ejemplo, la clase _"troy\_mcclure"_ se tienen 115 elementos de entrenamiento, pero solo 5 elementos de prueba. Se puede apreciar en la Figura que las imágenes de cada clase tienen diferentes tamaños, relación de aspecto, el fondo puede ser de un color o tener una escena. En algunos casos, las imágenes pueden tener más de un personaje. Debido a lo anterior, se hará una redistribución de los datos de entrenamiento, de validación y de test, así como un preprocesamiento de los datos para realizar el modelo.
 
-![](RackMultipart20221024-1-ti85jf_html_933d2b9fdf6fbbec.png)
+Aqui va una imagen
 
 Una exploración a fondo revela que el dataset cuenta con diferentes tipos de archivos y no solo imágenes, las extensiones encontradas son .JPG, .bmp, .gif, .jpeg, .jpg, .png.
 
@@ -99,11 +88,11 @@ Las dimensiones de cada imagen deben estandarizarse para homogeneizar los datos 
 
 Se propone clasificar 10 clases del dataset:
 
-|
- | Nombre | Train Image | Test Image | Total |
+<div align="center">
+ 
+Clase| Nombre | Train Image | Test Image | Total |
 | --- | --- | --- | --- | --- |
 | 1 | maggie\_simpson | 1371.0 | 162.0 | 1533.0 |
-| --- | --- | --- | --- | --- |
 | 2 | ned\_flanders | 1454.0 | 49.0 | 1503.0 |
 | 3 | moe\_szyslak | 1452.0 | 50.0 | 1502.0 |
 | 4 | krusty\_the\_clown | 1206.0 | 50.0 | 1256.0 |
@@ -113,14 +102,15 @@ Se propone clasificar 10 clases del dataset:
 | 8 | milhouse\_van\_houten | 1091.0 | 49.0 | 1140.0 |
 | 9 | chief\_wiggum | 986.0 | 50.0 | 1036.0 |
 | 10 | abraham\_grampa\_simpson | 912.0 | 48.0 | 960.0 |
+</div>
 
 La distribución de los datos para entrenamiento y validación son reordenadas en conjuntos de entrenamiento, validación y test, como se muestra en la siguiente tabla:
 
-|
- | Nombre | Train | Validation | Test |
+<div align="center">
+ 
+Clase | Nombre | Train | Validation | Test |
 | --- | --- | --- | --- | --- |
 | 0 | maggie\_simpson | 1101 | 276 | 154 |
-| --- | --- | --- | --- | --- |
 | 1 | ned\_flanders | 1081 | 271 | 151 |
 | 2 | moe\_szyslak | 1080 | 271 | 151 |
 | 3 | krusty\_the\_clown | 904 | 226 | 126 |
@@ -130,16 +120,16 @@ La distribución de los datos para entrenamiento y validación son reordenadas e
 | 7 | milhouse\_van\_houten | 820 | 206 | 114 |
 | 8 | chief\_wiggum | 745 | 187 | 104 |
 | 9 | abraham\_grampa\_simpson | 691 | 173 | 96 |
-|
- | Total | 9050 | 2268 | 1263 |
-
+|| Total | 9050 | 2268 | 1263 |
+ </div>
+ 
 El conjunto de datos es preprocesado y empaquetado en archivos TFRecords para facilitar su manipulación, así como el entrenamiento de la red neuronal. Por cada set, se obtuvieron 15 archivos con extensión _.tfrec_. Cada archivo contiene la imagen codificada a uint8, la etiqueta numérica (0, 1, 2, etc.) y la etiqueta categórica correspondiente.
 
 ## Preprocesamiento de datos
 
 Los datos se estandarizan a una resolución de 64x64 pixeles, manteniendo los 3 canales de la imagen. Si la imagen tiene dimensiones menores a las especificadas se realiza la operación de _reshape_ conservando la relación de aspecto de la imagen. Si la imagen es mayor en alguna dimensión (Largo o Ancho) se realiza la operación de _reshape_ a 84x84 y luego se aplica la operación de _crop_ o _padding_ según se requiera, este paso es importante porque permite preservar información. La Figura muestra el efecto que se tiene al realizar el preprocesamiento, debido a que se conserva la relación de aspecto en las imágenes, la Figura muestra bordes negros. Las imágenes guardadas en los archivos TFRecord no se encuentran normalizadas. No se realiza ningún tipo de operación para el filtrado de imágenes, manipulación de contraste o brillo.
 
-![](RackMultipart20221024-1-ti85jf_html_aeeb6854614585f6.png)
+Aqui va otra imagen
 
 ## Hiper-parámetros y medidas de desempeño
 
@@ -153,21 +143,21 @@ La Figura muestra la arquitectura utilizada, se utilizan 4 capas convolucionales
 
 El modelo fue entrenado 13 épocas con batches de 40 imágenes. Los pesos iniciales fueron obtenidos mediante la inicialización de Lecun Uniform. El entrenamiento duro 5 minutos con una GPU Tesla T4.
 
-![](RackMultipart20221024-1-ti85jf_html_5f4d27b884c86bde.png)
+Imagen de accuracy
 
 Se obtuvieron las curvas de accuracy y loss, las cuales se presentan en la Figura y Figura respectivamente.
 
-![](RackMultipart20221024-1-ti85jf_html_3c14203a1da9d8b2.png)
+Imagen de Loss
 
 ## Evaluación del modelo
 
 El accuracy obtenido en test fue de 0.87, considerablemente alto.
 
-![](RackMultipart20221024-1-ti85jf_html_699e699231a05661.png)
+Confusion matrix
 
 Se obtuvo la matriz de confusión para visualizar el desempeño del modelo, así como las métricas que proporciona la librería sklearn con el método clasfication\_report.
 
-![](RackMultipart20221024-1-ti85jf_html_e4ae9e3acd435a28.png)
+clsification report
 
 # Comentarios finales
 
@@ -177,4 +167,5 @@ Se obtuvo la matriz de confusión para visualizar el desempeño del modelo, así
 - Los pesos iniciales del modelo han sido cruciales para obtener un buen desempeño, puesto que en experimentos anteriores con pesos iniciales obtenidos mediante una distribución normal uniforme se requerían hasta 300 épocas para alcanzar una fracción del desempeño actual, aun con la misma arquitectura. Agradezco al Lic. Fernando A. Canto por su recomendación para usar inicializadores como Xavier, He y Lecun.
 - Como se aprecia en la Figura la clase charles\_montgomery\_burns es la clase con más falsos positivos, siendo la clase moe\_szyslak la clase con la cual se confunde más. Este tipo de confusión se debe a que ambas clases comparten características similares, visten con el mismo tono de colores además de que su cabello es del mismo color.
 
-Página 14 de 14
+
+
